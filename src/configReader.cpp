@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "configReader.h"
 #include "identifier.h"
 #include "stringUtils.h"
