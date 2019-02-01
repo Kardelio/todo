@@ -27,6 +27,7 @@ void addATodo(string thing);
 void deleteSingleTodo(int id);
 void editSingleTodo(int id);
 void clearAllTodos();
+void clearScreen();
 void printConfigData();
 int identifierListContainsId(std::vector<Identifier> vec,int id);
 
@@ -58,14 +59,15 @@ int main(int argc, char *argv[])
     // cout << argv[0] << argc << endl;
 
     if(argc == 1){
-        printConfigData();
+        //printConfigData();
         readAllTodos();
     } else {
         int c;
         while ((c = getopt (argc, argv, "cd:rie:p:l:t:h")) != -1){
             switch (c) {
                 case 'c':
-                    clearAllTodos();
+                    clearScreen();
+                    readAllTodos();
                     exit(0);
                     break;
                 case 'd':
@@ -74,6 +76,7 @@ int main(int argc, char *argv[])
                     break; 
                 case 'r':
                     //TODO
+                    clearAllTodos();
                     exit(0);
                     break;
                 case 'i':
@@ -135,7 +138,8 @@ void readAllTodos(){
                 for(size_t j = 0; j < list_items.at(i).getListOfTodoItems().size(); j++)
                 {
                     TodoItem t = list_items.at(i).getListOfTodoItems().at(j);
-                    t.printWithFGandBG(listOfLists.at(res).getForeground(),listOfLists.at(res).getBackground(), *cnfgReader,listOfPriorities);
+                    // t.printWithFGandBG(listOfLists.at(res).getForeground(),listOfLists.at(res).getBackground(), *cnfgReader,listOfPriorities);
+                    t.printWithFGandBGNew(listOfLists.at(res).getForeground(),listOfLists.at(res).getBackground(), *cnfgReader,listOfPriorities);
                 }
             }
         }
@@ -251,4 +255,8 @@ int identifierListContainsId(std::vector<Identifier> vec,int id){
     } else {
         return -1;
     }
+}
+
+void clearScreen(){
+      system("clear");
 }

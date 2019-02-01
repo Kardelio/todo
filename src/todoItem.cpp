@@ -28,7 +28,19 @@ void TodoItem::printWithFGandBG(int fg, int bg, ConfigReader cfg, std::vector<Id
     Identifier i = listOfPris.at((m_priority - 1));
     std::string priStr = escape+"["+std::to_string(i.getForeground())+";"+std::to_string(i.getBackground())+";1m "+i.getTitle()+" "+clear+" ";
     
-    std::cout << escape << "[" << fg << ";" << bg << ";1" << "m" << " " << m_id << " " << clear  << ": " << priStr << tagStr << m_title << std::endl;
+    std::cout << escape << "[" << fg << ";" << bg << ";1" << "m" << " " << m_id << " " << clear  << ": " << priStr << m_title << " " << tagStr << std::endl;
+}
+
+void TodoItem::printWithFGandBGNew(int fg, int bg, ConfigReader cfg, std::vector<Identifier> listOfPris){
+    std::string tagStr = "";
+    if(m_tag != "EMPTY"){
+        tagStr = escape+"["+cfg.getConfigValueForKey("tagColorFront")+";"+cfg.getConfigValueForKey("tagColorBack")+";1m "+m_tag+" "+clear+" ";
+    }
+    Identifier i = listOfPris.at((m_priority - 1));
+    std::string priStrColor = escape+"["+std::to_string(i.getForeground())+";"+std::to_string(i.getBackground())+"m ";
+    std::string priStr = escape+"["+std::to_string(i.getForeground())+";"+std::to_string(i.getBackground())+";1m "+i.getTitle()+" "+clear+" ";
+    
+    std::cout << escape << "[" << fg << ";" << bg << ";1" << "m" << " " << m_id << " " << clear  << ": " << priStrColor << m_title << " " << clear << " " << tagStr << std::endl;
 }
 
 int TodoItem::getId(){

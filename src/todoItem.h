@@ -18,6 +18,7 @@ class TodoItem{
         std::string getName();
         void standardPrint();
         void printWithFGandBG(int fg, int bg, ConfigReader cfg, std::vector<Identifier> listOfPris);
+        void printWithFGandBGNew(int fg, int bg, ConfigReader cfg, std::vector<Identifier> listOfPris);
         int getId();
         void setId(int idIn);
         int getListId(){

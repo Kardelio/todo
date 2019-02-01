@@ -10,8 +10,15 @@ CFLAGS=-g
 SOURCES=$(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS=$(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
-$(TARGET): $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o
+$(TARGET): env $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o
 	$(CC) $(CPLUSPLUSVERSION) $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o -o $(TARGET)
+
+env:
+	@echo "CC         = ${CC}"
+	@echo "BUILDDIR   = ${BUILDDIR}"
+	@echo "SRCDIR     = ${SRCDIR}"
+	@echo "INC        = ${INC}"
+	@echo "MAKE       = ${MAKE}"
 
 $(BUILDDIR)/todo.o: $(SRCDIR)/todo.cpp
 	$(CC) $(CPLUSPLUSVERSION) -c $(SRCDIR)/todo.cpp -o $(BUILDDIR)/todo.o
@@ -34,7 +41,7 @@ $(BUILDDIR)/identifier.o: $(SRCDIR)/identifier.cpp $(SRCDIR)/identifier.h
 $(BUILDDIR)/listItem.o: $(SRCDIR)/listItem.cpp $(SRCDIR)/listItem.h
 	$(CC) $(CPLUSPLUSVERSION) -c $(SRCDIR)/listItem.cpp -o $(BUILDDIR)/listItem.o
 
-read:
+read: env
 	echo $(SOURCES)
 	echo $(OBJECTS)
 
