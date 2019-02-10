@@ -10,7 +10,7 @@ CFLAGS=-g
 SOURCES=$(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS=$(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
-$(TARGET): env $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o
+$(TARGET): env checkBuildDir $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o
 	$(CC) $(CPLUSPLUSVERSION) $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o -o $(TARGET)
 
 env:
@@ -19,6 +19,11 @@ env:
 	@echo "SRCDIR     = ${SRCDIR}"
 	@echo "INC        = ${INC}"
 	@echo "MAKE       = ${MAKE}"
+
+#the - infront of the mkdir allows it to continue if it fails
+#in this case if the folder already exists
+checkBuildDir:
+	-mkdir build
 
 $(BUILDDIR)/todo.o: $(SRCDIR)/todo.cpp
 	$(CC) $(CPLUSPLUSVERSION) -c $(SRCDIR)/todo.cpp -o $(BUILDDIR)/todo.o

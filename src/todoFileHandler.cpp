@@ -22,6 +22,23 @@ std::string TodoFileHandler::getConfigFullFileLocation(){
     return s;
 }
 
+void TodoFileHandler::readTempFile(){
+    list<TodoItem> listOfItems;
+    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
+            int ida = stoi(a.at(0));
+            int pria = stoi(a.at(3));
+            int listid = stoi(a.at(4));
+            TodoItem item(ida, listid, a.at(1), a.at(2), pria);
+            listOfItems.push_back(item);
+        }
+        file.close();
+    }
+}
+
 std::vector<TodoItem> TodoFileHandler::readTodoFileAndGetVector(){
     vector<TodoItem> listOfItems;
     std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());

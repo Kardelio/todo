@@ -21,4 +21,5 @@ class TodoFileHandler{
         static int containsListItemWithId(std::vector<ListItem> vec,int id);
         static int containsTodoItemWithIdInList(std::list<TodoItem> vec,int id);
         static void writeFullListToFile(std::list<TodoItem> list_of_items);
+        static void readTempFile();
 };

@@ -20,3 +20,4 @@ That this is great
 e.g 1,5,66,3...  you can then change their tag, pri, and list in a mass edit but NOT the title
 * Edit a single title gives you it in editor
 * Add notes to each todo that can be displayed or not
+* Handle a syncing function to get todo lists anywhere! - use git?

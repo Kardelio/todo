@@ -10,14 +10,21 @@
 #include <fstream>
 #include <unistd.h>
 
-#define USAGE "Usage: catimg [-h] [-w width] [-l loops] [-r resolution] image-file\n\n" \
-  "  -h: Displays this message\n"                                      \
-  "  -w: Terminal width by default\n"                           \
-  "  -l: Loops are only useful with GIF files. A value of 1 means that the GIF will " \
-  "be displayed twice because it loops once. A negative value means infinite " \
-  "looping\n"                                                           \
-  "  -r: Resolution must be 1 or 2. By default catimg checks for unicode support to " \
-  "use higher resolution\n" \
+#include <time.h>
+#include <stdlib.h>
+//cd:rie:p:l:t:hms
+#define USAGE "Usage: todo [-h] [-i info] [-l loops] [-r resolution] image-file\n\n" \
+  "  -h: Displays this message\n"\
+  "  -i: info: Displays to the user all the current lists available with their \n"\
+  "associated id's and colors. It also displays to the user all the current priorities\n"\
+  "to the user with id associated id's and colors."\
+  "  -w: Terminal width by default\n"\
+  "  -l: Loops are only useful with GIF files. A value of 1 means that the GIF will "\
+  "be displayed twice because it loops once. A negative value means infinite "\
+  "be displayed twice because it loops once. A negative value means infinite "\
+  "looping\n"\
+  "  -r: Resolution must be 1 or 2. By default catimg checks for unicode support to "\
+  "use higher resolution\n"\
   "  -c: Convert colors to a restricted palette\n"
 
 using namespace std;
@@ -30,6 +37,8 @@ void clearAllTodos();
 void clearScreen();
 void printConfigData();
 int identifierListContainsId(std::vector<Identifier> vec,int id);
+
+void experiment();
 
 static string escape = "\u001b";
 static string clear = "\u001b[0m";
@@ -63,7 +72,7 @@ int main(int argc, char *argv[])
         readAllTodos();
     } else {
         int c;
-        while ((c = getopt (argc, argv, "cd:rie:p:l:t:h")) != -1){
+        while ((c = getopt (argc, argv, "cd:rie:p:l:t:hms")) != -1){
             switch (c) {
                 case 'c':
                     clearScreen();
@@ -89,6 +98,10 @@ int main(int argc, char *argv[])
                     editSingleTodo(stoi(optarg));   
                     exit(0);
                     break;
+                case 's':
+                    //TODO sync the todo file
+                    exit(0);
+                    break;
                 case 'p':
                     currentPriority = stoi(optarg);
                     break;
@@ -100,6 +113,10 @@ int main(int argc, char *argv[])
                     break;
                 case 'h':
                     printf(USAGE);  
+                    exit(0);
+                    break;
+                case 'm':
+                    experiment();
                     exit(0);
                     break;
                 default:
@@ -133,13 +150,12 @@ void readAllTodos(){
             if(res > -1){
                 Identifier item = listOfLists.at(res);
                 cout << endl;
-                cout << escape << "[" << item.getForeground() << ";" << item.getBackground() << "m" << "    " << item.getId() << ". " << escape << "[1m" << item.getTitle() << "      " << clear << endl;
+                cout << item.getColorWithEscapes() << "    " << item.getId() << ". " << escape << "[1m" << item.getTitle() << "      " << clear << endl;
                 
                 for(size_t j = 0; j < list_items.at(i).getListOfTodoItems().size(); j++)
                 {
                     TodoItem t = list_items.at(i).getListOfTodoItems().at(j);
-                    // t.printWithFGandBG(listOfLists.at(res).getForeground(),listOfLists.at(res).getBackground(), *cnfgReader,listOfPriorities);
-                    t.printWithFGandBGNew(listOfLists.at(res).getForeground(),listOfLists.at(res).getBackground(), *cnfgReader,listOfPriorities);
+                    t.printWithFGandBGNew(listOfLists.at(res).getColorWithEscapes(), *cnfgReader,listOfPriorities);
                 }
             }
         }
@@ -172,6 +188,12 @@ void editSingleTodo(int id){
     itera->standardPrint();
 
     cout << escape << "[37;44m" << "Edit the NEW Title (Leave blank to keep it as it is...)" << clear << endl;
+	//itera->getTitle()  = is the string
+	//could put it into a temp file
+	//open file in EDITOR
+	//save and close the file
+	//cat file to variable
+	//delete file
     string newTitle;
     getline(cin,newTitle);
     if(newTitle.empty()){
@@ -231,7 +253,7 @@ void printConfigData(){
     for(size_t i = 0; i < listOfLists.size(); i++)
     {
         Identifier sing = listOfLists.at(i);
-        cout << " " << escape << "[" << sing.getForeground() << ";" << sing.getBackground() << ";1m " << sing.getId() << ". " << sing.getTitle() << " " << clear << " ";
+        cout << " " << sing.getColorWithEscapes() << " " << sing.getId() << ". " << sing.getTitle() << " " << clear << " ";
     }
     cout << endl;
 
@@ -239,7 +261,7 @@ void printConfigData(){
     for(size_t i = 0; i < listOfPriorities.size(); i++)
     {
         Identifier singP = listOfPriorities.at(i);
-        cout << " " << escape << "[" << singP.getForeground() << ";" << singP.getBackground() << ";1m " << singP.getId() << ". " << singP.getTitle() << " " << clear << " ";
+        cout << " " << singP.getColorWithEscapes() << " " << singP.getId() << ". " << singP.getTitle() << " " << clear << " ";
     }
     cout << endl;   
 }
@@ -259,4 +281,38 @@ int identifierListContainsId(std::vector<Identifier> vec,int id){
 
 void clearScreen(){
       system("clear");
+}
+
+void experiment(){
+	cout << "This function is not ready yet!" << endl;
+    string example = "This is my example string";
+
+    char date[11];
+    time_t t = time(0);
+    struct tm *tm;
+    tm = gmtime(&t);
+    strftime(date,sizeof(date),"%m%d%H%M%S", tm); 
+    // printf("%s\n",date);
+    string tempFile = std::string("$HOME/")+std::string(".todo")+std::string(date);
+    system(("echo \""+example+"\" > "+tempFile).c_str()); //Echoes the stirng into the temp file
+    system(("$EDITOR "+tempFile).c_str()); //opens the file
+
+
+    printf("nasdosdssdfdsfdsds___   dfsdf adoi");  
+
+    std::ifstream file(tempFile);
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) { 
+            printf("nasdosadoi");  
+            cout << line << endl;
+        }
+        file.close();
+    }  
+
+    // std::ofstream outfile;
+
+    // outfile.open(TodoFileHandler::getConfigFullFileLocation().c_str(), std::ios_base::app);
+    // std::string fullRow = std::to_string(TodoFileHandler::getNumberOfItems())+""+seperator+""+tag+""+seperator+""+thing+""+seperator+""+std::to_string(pri)+""+seperator+""+std::to_string(list)+"\n";
+    // outfile << fullRow;
 }

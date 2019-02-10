@@ -5,10 +5,9 @@ class Identifier{
     private:
         int m_id;
         std::string m_label;
-        int m_foreground;
-        int m_background;
+        std::string m_color;
     public:
-        Identifier(int id, std::string label, int foreground, int background) : m_id(id), m_label(label), m_foreground(foreground), m_background(background){};
+        Identifier(int id, std::string label, std::string color) : m_id(id), m_label(label), m_color(color) {};
         void printOut();
         int getId(){
             return m_id;
@@ -16,10 +15,10 @@ class Identifier{
         std::string getTitle(){
             return m_label;
         };
-        int getForeground(){
-            return m_foreground;
-        };
-        int getBackground(){
-            return m_background;
-        };
+        std::string getColor(){
+            return m_color;
+        }
+        std::string getColorWithEscapes(){
+            return "\u001b["+m_color+"m";
+        }
 };

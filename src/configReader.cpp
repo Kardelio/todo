@@ -63,9 +63,8 @@ std::vector<Identifier> ConfigReader::getLists(){
         vector<string> eachElm = splitStringIntoArrayUsingDelim(allLists.at(i),",");
         int id = stoi(eachElm.at(0));
         string label = eachElm.at(1);
-        int fg = stoi(eachElm.at(2));
-        int bg = stoi(eachElm.at(3));
-        listOfLists.push_back(Identifier(id,label,fg,bg));
+        string col = eachElm.at(2);
+        listOfLists.push_back(Identifier(id,label,col));
     }
     return listOfLists;
 }
@@ -79,9 +78,8 @@ std::vector<Identifier> ConfigReader::getPriorities(){
         vector<string> eachElm = splitStringIntoArrayUsingDelim(allLists.at(i),",");
         int id = stoi(eachElm.at(0));
         string label = eachElm.at(1);
-        int fg = stoi(eachElm.at(2));
-        int bg = stoi(eachElm.at(3));
-        listOfPri.push_back(Identifier(id,label,fg,bg));
+        string col = eachElm.at(2);
+        listOfPri.push_back(Identifier(id,label,col));
     }
     return listOfPri;
 }
