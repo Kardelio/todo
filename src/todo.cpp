@@ -195,7 +195,6 @@ void readAllTodos(){
 }
 
 void readTodosInSingleList(int listNum){
-	cout << "Looking at list: " << listNum << endl;
     vector<ListItem> list_items = TodoFileHandler::readTodoFileIntoListItemsWithSingleList(listNum);
     if(list_items.size() > 0){
         for(size_t i = 0; i < list_items.size(); i++)
