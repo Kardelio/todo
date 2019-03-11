@@ -11,7 +11,9 @@ using namespace std;
 TodoFileHandler::TodoFileHandler(){
 }
 
+//TODO make this file the primary file on the config
 std::string TodoFileHandler::todoFileName = ".todo";
+std::string TodoFileHandler::secondaryTodoFileName = ".todoBacklog";
 std::string TodoFileHandler::seperator = "+++";
 int TodoFileHandler::numberOfItems = 0;
 
@@ -20,6 +22,11 @@ std::string TodoFileHandler::getConfigFullFileLocation(){
     std::string s(homeDir);
     s.append("/"+todoFileName);
     return s;
+}
+
+void TodoFileHandler::setPrimaryAndSecondaryFile(std::string prim, std::string second){
+	TodoFileHandler::todoFileName = prim;
+	TodoFileHandler::secondaryTodoFileName = second;
 }
 
 void TodoFileHandler::readTempFile(){

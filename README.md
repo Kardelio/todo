@@ -23,3 +23,4 @@ e.g 1,5,66,3...  you can then change their tag, pri, and list in a mass edit but
 * Handle a syncing function to get todo lists anywhere! - use git?
 * Order list by priority or by number taking them out of their lists
 * Be able to add prirorities couldnt add a new one
+* Deleted items go to the backup file instead

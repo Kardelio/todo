@@ -7,11 +7,13 @@
 class TodoFileHandler{
     private:
         static std::string todoFileName;
+        static std::string secondaryTodoFileName;
         static std::string seperator;
         static std::string getConfigFullFileLocation();
         static int numberOfItems;
     public:
         TodoFileHandler();
+        static void setPrimaryAndSecondaryFile(std::string prim, std::string second);
         static std::vector<TodoItem> readTodoFileAndGetVector();
         static std::list<TodoItem> readTodoFileAndGetList();
         static int getNumberOfItems();

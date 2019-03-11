@@ -53,6 +53,9 @@ void experiment();
 
 static string escape = "\u001b";
 static string clear = "\u001b[0m";
+static string invert = "\u001b[7m";
+static string whiteAndBlack = "\u001b[30;47m";
+static string whiteText = "\u001b[97m";
 
 int currentPriority = 2;
 int currentListToPutIn = 1;
@@ -62,6 +65,8 @@ vector<Identifier> listOfLists;
 vector<Identifier> listOfPriorities;
 int tagColorFg = 0;
 int tagColorBg = 0;
+string primaryFile = ".todo";
+string secondaryFile = ".todoBacklog";
 ConfigReader *cnfgReader = new ConfigReader();
 
 
@@ -74,7 +79,10 @@ int main(int argc, char *argv[])
     listOfPriorities = cnfgReader->getPriorities();
     tagColorFg = stoi(cnfgReader->getConfigValueForKey("tagColorFront"));
     tagColorBg = stoi(cnfgReader->getConfigValueForKey("tagColorBack"));
-
+	primaryFile = cnfgReader->getConfigValueForKey("todoFile");
+	secondaryFile = cnfgReader->getConfigValueForKey("todoBackUpFile");
+	
+    TodoFileHandler::setPrimaryAndSecondaryFile(primaryFile,secondaryFile);
     // cout << "Args: " << argc << endl;
     // cout << argv[0] << argc << endl;
 
@@ -298,16 +306,25 @@ void deleteSingleTodo(int id){
     }
 
     TodoFileHandler::writeFullListToFile(list_items);
+	//TODO put deleted ones into own list and write that to the backup
+	//just append it
     readAllTodos();
 }
 
 void printConfigData(){
-    cout << "Lists:";
+	cout << "Files:";
+	cout << " " << whiteText << "Todo file:" << clear << " " << invert << " " << primaryFile << " " << clear << " ";
+	cout << " " << whiteText << "BackUp file:" << clear << " " << invert << " " << secondaryFile << " " << clear << " ";
+ 	cout<< endl;
+ 	cout<< endl;
+    
+	cout << "Lists:";
     for(size_t i = 0; i < listOfLists.size(); i++)
     {
         Identifier sing = listOfLists.at(i);
         cout << " " << sing.getColorWithEscapes() << " " << sing.getId() << ". " << sing.getTitle() << " " << clear << " ";
     }
+    cout << endl;
     cout << endl;
 
     cout << "Priorities:";

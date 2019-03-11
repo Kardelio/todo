@@ -51,7 +51,11 @@ void ConfigReader::readConfigFileIn(){
 }
 
 std::string ConfigReader::getConfigValueForKey(std::string key){
-    return m_configMap.find(key)->second;
+	map<std::string,std::string>::iterator it = m_configMap.find(key);
+	if(it != m_configMap.end()){
+		return it->second;
+	}
+	return "";
 }   
 
 std::vector<Identifier> ConfigReader::getLists(){
