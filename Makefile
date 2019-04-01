@@ -10,8 +10,8 @@ CFLAGS=-g
 SOURCES=$(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS=$(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
-$(TARGET): env checkBuildDir $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o
-	$(CC) $(CPLUSPLUSVERSION) $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/identifier.o $(BUILDDIR)/listItem.o -o $(TARGET)
+$(TARGET): env checkBuildDir $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/listItem.o
+	$(CC) $(CPLUSPLUSVERSION) $(BUILDDIR)/todo.o $(BUILDDIR)/configReader.o $(BUILDDIR)/stringUtils.o $(BUILDDIR)/todoItem.o $(BUILDDIR)/todoFileHandler.o $(BUILDDIR)/listItem.o -o $(TARGET)
 
 env:
 	@echo "CC         = ${CC}"
@@ -40,8 +40,6 @@ $(BUILDDIR)/todoItem.o: $(SRCDIR)/todoItem.cpp $(SRCDIR)/todoItem.h
 $(BUILDDIR)/todoFileHandler.o: $(SRCDIR)/todoFileHandler.cpp $(SRCDIR)/todoFileHandler.h
 	$(CC) $(CPLUSPLUSVERSION) -c $(SRCDIR)/todoFileHandler.cpp -o $(BUILDDIR)/todoFileHandler.o
 
-$(BUILDDIR)/identifier.o: $(SRCDIR)/identifier.cpp $(SRCDIR)/identifier.h
-	$(CC) $(CPLUSPLUSVERSION) -c $(SRCDIR)/identifier.cpp -o $(BUILDDIR)/identifier.o
 
 $(BUILDDIR)/listItem.o: $(SRCDIR)/listItem.cpp $(SRCDIR)/listItem.h
 	$(CC) $(CPLUSPLUSVERSION) -c $(SRCDIR)/listItem.cpp -o $(BUILDDIR)/listItem.o

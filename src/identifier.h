@@ -8,7 +8,6 @@ class Identifier{
         std::string m_color;
     public:
         Identifier(int id, std::string label, std::string color) : m_id(id), m_label(label), m_color(color) {};
-        void printOut();
         int getId(){
             return m_id;
         };

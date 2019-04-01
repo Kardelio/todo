@@ -1,9 +1,8 @@
 # Title
 
-Here is some markdown text son!
+Todo is a simple terminal application for keeping todo lists.
 
 ----
-
 what else can i say about it?
 
 ## Sub tutle
@@ -23,4 +22,5 @@ e.g 1,5,66,3...  you can then change their tag, pri, and list in a mass edit but
 * Handle a syncing function to get todo lists anywhere! - use git?
 * Order list by priority or by number taking them out of their lists
 * Be able to add prirorities couldnt add a new one
-* Deleted items go to the backup file instead
+DONE - >* Deleted items go to the backup file instead
+* Add Man page 

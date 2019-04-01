@@ -41,8 +41,12 @@ bool isThereText(char *argv[], int argc, string thisOpt);
 void readAllTodos();
 void readTodosInSingleList(int listNum);
 void addATodo(string thing);
+void addATDItemToFile(TodoItem item, string file);
 void deleteSingleTodo(int id);
+TodoItem getSingleTodoItem(int id, string file);
+void deleteSingleTodoFromSpecificFile(int id, string file);
 void editSingleTodo(int id);
+void moveTodo(int id, bool toPrimary);
 void clearAllTodos();
 void clearScreen();
 void drawStartLine();
@@ -59,6 +63,7 @@ static string whiteText = "\u001b[97m";
 
 int currentPriority = 2;
 int currentListToPutIn = 1;
+bool displayBacklogToo = false;
 string currentTag = "EMPTY";
 
 vector<Identifier> listOfLists;
@@ -91,7 +96,7 @@ int main(int argc, char *argv[])
         readAllTodos();
     } else {
         int c;
-        while ((c = getopt (argc, argv, "cd:rie:p:l:t:hms")) != -1){
+        while ((c = getopt (argc, argv, "cd:rie:p:l:t:hb:m:sa")) != -1){
             switch (c) {
                 case 'c':
                     clearScreen();
@@ -141,9 +146,22 @@ int main(int argc, char *argv[])
                     printf(USAGE);  
                     exit(0);
                     break;
-                case 'm':
-                    experiment();
+                case 'b':
+					//Move into backlog
+                    //experiment();
+					moveTodo(stoi(optarg),true);
                     exit(0);
+                    break;
+                case 'm':
+					//Move into Main
+                    //experiment();
+					moveTodo(stoi(optarg),false);
+                    exit(0);
+                    break;
+                case 'a':
+					displayBacklogToo = true;
+					readAllTodos();
+					exit(0);
                     break;
                 default:
                     cout << "Invalid Option: " << c << endl;
@@ -175,7 +193,11 @@ bool isThereText(char *argv[], int argc, string thisOpt){
 }
 
 void addATodo(string thing){
-    TodoFileHandler::addTodoItemToFile(currentListToPutIn,currentTag,thing,currentPriority);
+    TodoFileHandler::addTodoItemToFileToSpecificFile(currentListToPutIn,currentTag,thing,currentPriority,TodoFileHandler::getConfigFullFileLocation());
+}
+
+void addATDItemToFile(TodoItem item, string file){
+    TodoFileHandler::addactualTDToSpecificFile(item,file);
 }
 
 void readAllTodos(){
@@ -199,7 +221,22 @@ void readAllTodos(){
     } else {
         cout << "Empty" << endl;
     }
+
     cout << endl;
+
+	if(displayBacklogToo){
+		cout << escape << whiteAndBlack << "--- BACKLOG ---" << clear << endl;
+		vector<TodoItem> backlog_items = TodoFileHandler::readBackLogFileIntoListItems();
+		if(backlog_items.size() > 0){
+			for(size_t i = 0; i < backlog_items.size(); i++)
+			{
+				backlog_items.at(i).backlogPrint();
+			}
+		} else {
+			cout << "Empty" << endl;
+		}
+		cout << endl;
+	}
 }
 
 void readTodosInSingleList(int listNum){
@@ -226,12 +263,29 @@ void readTodosInSingleList(int listNum){
     cout << endl;
 }
 
+void moveTodo(int id, bool toPrimary){
+	string locationTo = ""; 
+	string locationFrom = ""; 
+	if(toPrimary){
+		locationTo = TodoFileHandler::getConfigFullBackLogFileLocation();
+		locationFrom = TodoFileHandler::getConfigFullFileLocation();
+	}else {
+		locationTo = TodoFileHandler::getConfigFullFileLocation();
+		locationFrom = TodoFileHandler::getConfigFullBackLogFileLocation();
+	}
+	cout << "Moving todo: " << id << " to: " << locationTo << endl;
+	TodoItem ite = getSingleTodoItem(id,locationFrom);
+	deleteSingleTodoFromSpecificFile(id,locationFrom);
+	addATDItemToFile(ite,locationTo);
+	readAllTodos();
+}
+
 void clearAllTodos(){
     cout << "Are you sure you wish to CLEAR ALL the Todos? ... (y/n)(yes/no)" << endl;
     string answer;
     cin >> answer;
     if(answer == "y" || answer == "Y" || answer == "yes" || answer == "YES"){
-        TodoFileHandler::writeFullListToFile({});
+        TodoFileHandler::writeFullListToSpecificFile({},TodoFileHandler::getConfigFullFileLocation());
         readAllTodos();
     } else {
         cout << "Operation Aborted" << endl;
@@ -241,7 +295,7 @@ void clearAllTodos(){
 void editSingleTodo(int id){
     printConfigData();
 
-    list<TodoItem> list_items = TodoFileHandler::readTodoFileAndGetList();
+    list<TodoItem> list_items = TodoFileHandler::readTodoFileAndGetList(TodoFileHandler::getConfigFullFileLocation());
     int indxFind = TodoFileHandler::containsTodoItemWithIdInList(list_items,id);
     std::list<TodoItem>::iterator itera = list_items.begin();
     std::advance(itera,indxFind);
@@ -284,12 +338,12 @@ void editSingleTodo(int id){
     itera->setPriority(stoi(newPriority));
     itera->setListId(stoi(newList));
 
-    TodoFileHandler::writeFullListToFile(list_items);
+    TodoFileHandler::writeFullListToSpecificFile(list_items,TodoFileHandler::getConfigFullFileLocation());
     readAllTodos();
 }
 
 void deleteSingleTodo(int id){
-    list<TodoItem> list_items = TodoFileHandler::readTodoFileAndGetList();
+    list<TodoItem> list_items = TodoFileHandler::readTodoFileAndGetList(TodoFileHandler::getConfigFullFileLocation());
     int indxDel = TodoFileHandler::containsTodoItemWithIdInList(list_items,id);
     std::list<TodoItem>::iterator itera = list_items.begin();
     std::advance(itera,indxDel);
@@ -305,10 +359,42 @@ void deleteSingleTodo(int id){
         }
     }
 
-    TodoFileHandler::writeFullListToFile(list_items);
+    TodoFileHandler::writeFullListToSpecificFile(list_items, TodoFileHandler::getConfigFullFileLocation());
 	//TODO put deleted ones into own list and write that to the backup
 	//just append it
     readAllTodos();
+}
+
+TodoItem getSingleTodoItem(int id, string file){
+    list<TodoItem> list_items = TodoFileHandler::readTodoFileAndGetList(file);
+    int indxDel = TodoFileHandler::containsTodoItemWithIdInList(list_items,id);
+    std::list<TodoItem>::iterator itera = list_items.begin();
+    std::advance(itera,indxDel);
+	TodoItem item = *itera;
+	return item;
+}
+
+void deleteSingleTodoFromSpecificFile(int id, string file){
+	//cout << "Deleting from specific file: " << id << file << endl;
+    list<TodoItem> list_items = TodoFileHandler::readTodoFileAndGetList(file);
+    int indxDel = TodoFileHandler::containsTodoItemWithIdInList(list_items,id);
+    std::list<TodoItem>::iterator itera = list_items.begin();
+    std::advance(itera,indxDel);
+    //cout << "Deleting : " << itera->getId() << ": "<< itera->getName() << endl;
+	//get the item
+    list_items.erase(itera);
+
+    std::list<TodoItem>::iterator iter;
+    for (iter = list_items.begin(); iter != list_items.end(); ++iter){
+        int posNow = std::distance(list_items.begin(), iter);
+        // cout << "" << posNow << endl;
+        if(iter->getId() != posNow){
+            iter->setId(posNow);
+        }
+    }
+
+    TodoFileHandler::writeFullListToSpecificFile(list_items,file);
+	//readAllTodos();
 }
 
 void printConfigData(){

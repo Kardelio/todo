@@ -17,6 +17,7 @@ class TodoItem{
         void printItem();
         std::string getName();
         void standardPrint();
+        void backlogPrint();
         void printWithFGandBG(int fg, int bg, ConfigReader cfg, std::vector<Identifier> listOfPris);
         void printWithFGandBGNew(std::string color, ConfigReader cfg, std::vector<Identifier> listOfPris);
         int getId();

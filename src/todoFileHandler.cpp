@@ -24,6 +24,13 @@ std::string TodoFileHandler::getConfigFullFileLocation(){
     return s;
 }
 
+std::string TodoFileHandler::getConfigFullBackLogFileLocation(){
+    const char* homeDir = getenv("HOME");
+    std::string s(homeDir);
+    s.append("/"+secondaryTodoFileName);
+    return s;
+}
+
 void TodoFileHandler::setPrimaryAndSecondaryFile(std::string prim, std::string second){
 	TodoFileHandler::todoFileName = prim;
 	TodoFileHandler::secondaryTodoFileName = second;
@@ -64,9 +71,9 @@ std::vector<TodoItem> TodoFileHandler::readTodoFileAndGetVector(){
     return listOfItems;
 }
 
-std::list<TodoItem> TodoFileHandler::readTodoFileAndGetList(){
+std::list<TodoItem> TodoFileHandler::readTodoFileAndGetList(std::string fileToUse){
     list<TodoItem> listOfItems;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    std::ifstream file(fileToUse);
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -82,9 +89,9 @@ std::list<TodoItem> TodoFileHandler::readTodoFileAndGetList(){
     return listOfItems;
 }
 
-int TodoFileHandler::getNumberOfItems(){
+int TodoFileHandler::getNumberOfItemsInSpecificFile(std::string fileToCheck){
     int counter = 0;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    std::ifstream file(fileToCheck.c_str());
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -96,11 +103,19 @@ int TodoFileHandler::getNumberOfItems(){
     return numberOfItems;
 }
 
-void TodoFileHandler::addTodoItemToFile(int list, std::string tag, std::string thing, int pri){
+void TodoFileHandler::addactualTDToSpecificFile(TodoItem item, std::string fileToWriteTo){
     std::ofstream outfile;
 
-    outfile.open(TodoFileHandler::getConfigFullFileLocation().c_str(), std::ios_base::app);
-    std::string fullRow = std::to_string(TodoFileHandler::getNumberOfItems())+""+seperator+""+tag+""+seperator+""+thing+""+seperator+""+std::to_string(pri)+""+seperator+""+std::to_string(list)+"\n";
+    outfile.open(fileToWriteTo, std::ios_base::app);
+    std::string fullRow = std::to_string(TodoFileHandler::getNumberOfItemsInSpecificFile(fileToWriteTo))+""+seperator+""+item.getTag()+""+seperator+""+item.getTitle()+""+seperator+""+std::to_string(item.getPriority())+""+seperator+""+std::to_string(item.getListId())+"\n";
+    outfile << fullRow;
+}
+
+void TodoFileHandler::addTodoItemToFileToSpecificFile(int list, std::string tag, std::string thing, int pri, std::string fileToWriteTo){
+    std::ofstream outfile;
+
+    outfile.open(fileToWriteTo, std::ios_base::app);
+    std::string fullRow = std::to_string(TodoFileHandler::getNumberOfItemsInSpecificFile(fileToWriteTo))+""+seperator+""+tag+""+seperator+""+thing+""+seperator+""+std::to_string(pri)+""+seperator+""+std::to_string(list)+"\n";
     outfile << fullRow;
 }
 
@@ -152,6 +167,24 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSingleList(i
     return listOfLists;
 }
 
+std::vector<TodoItem> TodoFileHandler::readBackLogFileIntoListItems(){
+    vector<TodoItem> listOfItems;
+    std::ifstream file(TodoFileHandler::getConfigFullBackLogFileLocation().c_str());
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
+            int ida = stoi(a.at(0));
+            int pria = stoi(a.at(3));
+            int listid = stoi(a.at(4));
+            TodoItem item(ida, listid, a.at(1), a.at(2), pria);
+			listOfItems.push_back(item);
+        }
+        file.close();
+    }
+    return listOfItems;
+}
+
 int TodoFileHandler::containsTodoItemWithId(std::vector<TodoItem> vec,int id){
     typedef vector<TodoItem> IntContainer;
     typedef IntContainer::iterator IntIterator;
@@ -189,13 +222,13 @@ int TodoFileHandler::containsListItemWithId(std::vector<ListItem> vec,int id){
     }
 }
 
-void TodoFileHandler::writeFullListToFile(std::list<TodoItem> list_of_items){
+void TodoFileHandler::writeFullListToSpecificFile(std::list<TodoItem> list_of_items, std::string fileToUse){
     ofstream ofs;
-    ofs.open(TodoFileHandler::getConfigFullFileLocation().c_str(), std::ofstream::out | std::ofstream::trunc);
+    ofs.open(fileToUse, std::ofstream::out | std::ofstream::trunc);
     ofs.close();
 
     std::list<TodoItem>::iterator iter;
     for (iter = list_of_items.begin(); iter != list_of_items.end(); ++iter){
-        addTodoItemToFile(iter->getListId(),iter->getTag(),iter->getTitle(),iter->getPriority());
+        addTodoItemToFileToSpecificFile(iter->getListId(),iter->getTag(),iter->getTitle(),iter->getPriority(),fileToUse);
     }
 }

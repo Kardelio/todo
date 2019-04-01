@@ -13,6 +13,10 @@ std::string TodoItem::getName(){
     return m_title;
 }
 
+void TodoItem::backlogPrint(){
+    std::cout << m_id << " - " << m_title << std::endl;
+}
+
 void TodoItem::standardPrint(){
     std::cout << escape << "[7m Title:" << clear << " " << m_title << std::endl;
     std::cout << escape << "[7m Tag:" << clear << " " << m_tag << std::endl;
