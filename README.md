@@ -15,6 +15,7 @@ That this is great
 
 # Todo List 
 
+* Help -h arguement output correctly
 * Create a -m flag (mass edit) pass in numbers seperated by commas
 e.g 1,5,66,3...  you can then change their tag, pri, and list in a mass edit but NOT the title
 * Edit a single title gives you it in editor

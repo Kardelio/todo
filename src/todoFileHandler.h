@@ -22,6 +22,7 @@ class TodoFileHandler{
         static void addTodoItemToFileToSpecificFile(int list, std::string tag, std::string thing, int pri, std::string fileToWriteTo);
         static std::vector<ListItem> readTodoFileIntoListItems();
         static std::vector<ListItem> readTodoFileIntoListItemsWithSingleList(int listNum);
+        static std::vector<ListItem> readTodoFileIntoListItemsWithSinglePriority(int priNum);
         static std::vector<TodoItem> readBackLogFileIntoListItems();
         static int containsTodoItemWithId(std::vector<TodoItem> vec,int id);
         static int containsListItemWithId(std::vector<ListItem> vec,int id);

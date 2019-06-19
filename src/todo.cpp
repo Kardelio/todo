@@ -13,19 +13,48 @@
 #include <time.h>
 #include <stdlib.h>
 //cd:rie:p:l:t:hms
+//options : [-h help] [-i info] [-l list] [-p priority] [-c clear] [-r reset] [-d delete] [-e edit] [-t tag]
 #define USAGE ""\
-  "Usage: todo [-h help] [-i info] [-l list] [-p priority] [-e edit] [-t tag] 'YOUR TODO THING'\n\n" \
-  "  todo without any parameters will simply print all of your current todo items\n\n"\
-  "  -h: Displays this message\n\n"\
-  "  -i: info: Displays to the user all the current lists available with their \n"\
-  "associated id's and colors. It also displays to the user all the current priorities\n"\
-  "to the user with id associated id's and colors.\n\n"\
-  "  -l: list: If this parameter is assigned along with user input (a todo item) then\n"\
-  "the item will be allocated to this list, if however there is not user input or todo\n"\
+  "Usage: todo [options] ['YOUR TODO TEXT']\n\n" \
+  "todo without any parameters will simply print all of your current todo items\n\n"\
+  "options:\n"\
+  "	-h\n"\
+  "	Displays this help message and exits\n\n"\
+  "	-i\n"\
+  "	Displays to the user all the current lists available with their \n"\
+  "	associated id's and colors. It also displays to the user all the current priorities\n"\
+  "	to the user with id associated id's and colors.\n\n"\
+  "	-l [list]\n"\
+  "	If this parameter is assigned along with user input (a todo item) then\n"\
+  "	the item will be allocated to this list, if however there is not user input or todo\n"\
+  "	then the program will simply print out ONLY specified list of todo items.\n"\
+  "		EXAMPLE:\n"\
+  "		todo -l 2 'Dont forget to water the plants'\n"\
+  "		todo -l 2\n\n"\
+  "	-p [priority]\n"\
+  "	If this parameter is assigned along with user input (a todo item) then\n"\
+  "	the item will be allocated with this priority level, if however there is not user input or todo\n"\
+  "	then the program will simply print out ONLY specified list of todo items.\n"\
+  "		EXAMPLE:\n"\
+  "		todo -p 1 'Dont forget to water the plants'\n"\
+  "		todo -p 2\n\n"\
+  "	-c\n"\
+  "	'Clear Screen' : If this flag is included the terminal screen will be cleared beforehand\n"\
+  "	and grey barriers will be drawn around the entire output. (This is useful for example in an automated tmux pane)\n\n"\
+  "	-r\n"\
+  "	'Reset / Remove All' : BE CAREFUL WITH THIS FLAG. If included this will reset\n"\
+  "	all the todos (remove all todos) the program will ask you to confirm your\n"\
+  "	choice before it carries out the action\n\n"\
+  "	-d ID\n"\
+  "	'Delete Item' : Deletes the Todo item with the matching ID that is provided with the parameter\n\n"\
+  ""\
+  "the item will be allocated with this priority level, if however there is not user input or todo\n"\
   "then the program will simply print out ONLY specified list of todo items.\n\n"\
   "  EXAMPLE:\n"\
-  "     todo -l 2 'Dont forget to water the plants'\n"\
-  "     todo -l 2\n\n"\
+  "     todo -p 1 'Dont forget to water the plants'\n"\
+  "     todo -p 2\n\n"\
+  " "\
+  " TODO"\
   "  -w: Terminal width by default\n"\
   "  -l: Loops are only useful with GIF files. A value of 1 means that the GIF will "\
   "be displayed twice because it loops once. A negative value means infinite "\
@@ -40,8 +69,8 @@ using namespace std;
 bool isThereText(char *argv[], int argc, string thisOpt);
 void readAllTodos();
 void readTodosInSingleList(int listNum);
-void addATodo(string thing);
-void addATDItemToFile(TodoItem item, string file);
+void readTodosInSinglePriority(int priNum);
+void addATodo(string thing); void addATDItemToFile(TodoItem item, string file);
 void deleteSingleTodo(int id);
 TodoItem getSingleTodoItem(int id, string file);
 void deleteSingleTodoFromSpecificFile(int id, string file);
@@ -130,6 +159,12 @@ int main(int argc, char *argv[])
                     break;
                 case 'p':
                     currentPriority = stoi(optarg);
+					if(!isThereText(argv,argc,optarg)){
+						//readTodosInSingleList(stoi(optarg));
+						readTodosInSinglePriority(stoi(optarg));
+						exit(0);
+					}
+					//If no text to add then just print this list
                     break;
                 case 'l':
                     currentListToPutIn = stoi(optarg);
@@ -237,6 +272,30 @@ void readAllTodos(){
 		}
 		cout << endl;
 	}
+}
+
+void readTodosInSinglePriority(int priNum){
+    vector<ListItem> list_items = TodoFileHandler::readTodoFileIntoListItemsWithSinglePriority(priNum);
+    if(list_items.size() > 0){
+        for(size_t i = 0; i < list_items.size(); i++)
+        {
+            int res = identifierListContainsId(listOfLists,list_items.at(i).getId());
+            if(res > -1){
+                Identifier item = listOfLists.at(res);
+                cout << endl;
+                cout << item.getColorWithEscapes() << "    " << item.getId() << ". " << escape << "[1m" << item.getTitle() << "      " << clear << endl;
+                
+                for(size_t j = 0; j < list_items.at(i).getListOfTodoItems().size(); j++)
+                {
+                    TodoItem t = list_items.at(i).getListOfTodoItems().at(j);
+                    t.printWithFGandBGNew(listOfLists.at(res).getColorWithEscapes(), *cnfgReader,listOfPriorities);
+                }
+            }
+        }
+    } else {
+        cout << "Empty" << endl;
+    }
+    cout << endl;
 }
 
 void readTodosInSingleList(int listNum){
