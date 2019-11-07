@@ -25,3 +25,7 @@ e.g 1,5,66,3...  you can then change their tag, pri, and list in a mass edit but
 * Be able to add prirorities couldnt add a new one
 DONE - >* Deleted items go to the backup file instead
 * Add Man page 
+* Add timestamps to each todo
+* Add a todo log in the ~/.todo/ folders to log todo transactions ,add, delete, move etc...
+* Filter by tag - Github issue #1
+* Installaiton script or setup function to build folder and files etc...

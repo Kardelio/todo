@@ -6,16 +6,14 @@
 
 class TodoFileHandler{
     private:
-        static std::string todoFileName;
-        static std::string secondaryTodoFileName;
         static std::string seperator;
         static int numberOfItems;
     public:
+        static std::string todoFileName;
+        static std::string secondaryTodoFileName;
         TodoFileHandler();
-        static std::string getConfigFullFileLocation();
-		static std::string getConfigFullBackLogFileLocation();
+        static std::string getSpecificConfig(std::string file);
         static void setPrimaryAndSecondaryFile(std::string prim, std::string second);
-        static std::vector<TodoItem> readTodoFileAndGetVector();
         static std::list<TodoItem> readTodoFileAndGetList(std::string fileToUse);
         static int getNumberOfItemsInSpecificFile(std::string fileToCheck);
         static void addactualTDToSpecificFile(TodoItem item, std::string fileToWriteTo);
@@ -29,12 +27,4 @@ class TodoFileHandler{
         static int containsTodoItemWithIdInList(std::list<TodoItem> vec,int id);
         static void writeFullListToSpecificFile(std::list<TodoItem> list_of_items, std::string fileToUse);
         static void readTempFile();
-		/*
-		 * File handler
-		 * - get primary file location
-		 * - get secondary file location
-		 *   - set primary and seconday files
-		 *   - read todo file and get vector/list
-		 *   - get number of items in specific file //NOW
-		 */
 };

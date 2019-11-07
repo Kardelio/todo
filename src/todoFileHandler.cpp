@@ -11,23 +11,17 @@ using namespace std;
 TodoFileHandler::TodoFileHandler(){
 }
 
-//TODO make this file the primary file on the config
+//These two variables are set as defaults
+//in the case that the todocfg doesnt contain them
 std::string TodoFileHandler::todoFileName = ".todo";
 std::string TodoFileHandler::secondaryTodoFileName = ".todoBacklog";
 std::string TodoFileHandler::seperator = "+++";
 int TodoFileHandler::numberOfItems = 0;
 
-std::string TodoFileHandler::getConfigFullFileLocation(){
+std::string TodoFileHandler::getSpecificConfig(std::string file){
     const char* homeDir = getenv("HOME");
     std::string s(homeDir);
-    s.append("/"+todoFileName);
-    return s;
-}
-
-std::string TodoFileHandler::getConfigFullBackLogFileLocation(){
-    const char* homeDir = getenv("HOME");
-    std::string s(homeDir);
-    s.append("/"+secondaryTodoFileName);
+    s.append("/"+file);
     return s;
 }
 
@@ -38,7 +32,7 @@ void TodoFileHandler::setPrimaryAndSecondaryFile(std::string prim, std::string s
 
 void TodoFileHandler::readTempFile(){
     list<TodoItem> listOfItems;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -51,24 +45,6 @@ void TodoFileHandler::readTempFile(){
         }
         file.close();
     }
-}
-
-std::vector<TodoItem> TodoFileHandler::readTodoFileAndGetVector(){
-    vector<TodoItem> listOfItems;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
-    if (file.is_open()) {
-        std::string line;
-        while (getline(file, line)) {
-            vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
-            int ida = stoi(a.at(0));
-            int pria = stoi(a.at(3));
-            int listid = stoi(a.at(4));
-            TodoItem item(ida, listid, a.at(1), a.at(2), pria);
-            listOfItems.push_back(item);
-        }
-        file.close();
-    }
-    return listOfItems;
 }
 
 std::list<TodoItem> TodoFileHandler::readTodoFileAndGetList(std::string fileToUse){
@@ -121,7 +97,7 @@ void TodoFileHandler::addTodoItemToFileToSpecificFile(int list, std::string tag,
 
 std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItems(){
     vector<ListItem> listOfLists;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -144,7 +120,7 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItems(){
 
 std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSinglePriority(int priNum){
     vector<ListItem> listOfLists;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -169,7 +145,7 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSinglePriori
 
 std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSingleList(int listNum){
     vector<ListItem> listOfLists;
-    std::ifstream file(TodoFileHandler::getConfigFullFileLocation().c_str());
+    std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
@@ -194,7 +170,7 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSingleList(i
 
 std::vector<TodoItem> TodoFileHandler::readBackLogFileIntoListItems(){
     vector<TodoItem> listOfItems;
-    std::ifstream file(TodoFileHandler::getConfigFullBackLogFileLocation().c_str());
+    std::ifstream file(TodoFileHandler::getSpecificConfig(secondaryTodoFileName).c_str());
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
