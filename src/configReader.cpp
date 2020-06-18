@@ -20,6 +20,13 @@ std::string ConfigReader::getConfigFullFileLocation(){
     return s;
 }
 
+void ConfigReader::installTodo(){
+    //cout << "Checking todo is installed properly..." << endl;
+    /*
+     * Make sure folde ris there
+     */
+}
+
 void ConfigReader::checkForExistingConfig(){
 
   std::ifstream ifile(getConfigFullFileLocation().c_str());

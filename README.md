@@ -15,10 +15,11 @@ That this is great
 
 # Todo List 
 
+DONE - >* Order print out of todo table by list order not by ticket order
 * Help -h arguement output correctly
 * Create a -m flag (mass edit) pass in numbers seperated by commas
 e.g 1,5,66,3...  you can then change their tag, pri, and list in a mass edit but NOT the title
-* Edit a single title gives you it in editor
+DONE - >* Edit a single title gives you it in editor
 * Add notes to each todo that can be displayed or not
 * Handle a syncing function to get todo lists anywhere! - use git?
 * Order list by priority or by number taking them out of their lists

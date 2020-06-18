@@ -11,9 +11,10 @@ class TodoFileHandler{
     public:
         static std::string todoFileName;
         static std::string secondaryTodoFileName;
+        static std::string logfile;
         TodoFileHandler();
         static std::string getSpecificConfig(std::string file);
-        static void setPrimaryAndSecondaryFile(std::string prim, std::string second);
+        static void setInitialFiles(std::string prim, std::string second, std::string log);
         static std::list<TodoItem> readTodoFileAndGetList(std::string fileToUse);
         static int getNumberOfItemsInSpecificFile(std::string fileToCheck);
         static void addactualTDToSpecificFile(TodoItem item, std::string fileToWriteTo);
@@ -27,4 +28,5 @@ class TodoFileHandler{
         static int containsTodoItemWithIdInList(std::list<TodoItem> vec,int id);
         static void writeFullListToSpecificFile(std::list<TodoItem> list_of_items, std::string fileToUse);
         static void readTempFile();
+        static void writeToLogFile(bool shouldWrite, std::string message);
 };

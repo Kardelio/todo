@@ -15,6 +15,7 @@ TodoFileHandler::TodoFileHandler(){
 //in the case that the todocfg doesnt contain them
 std::string TodoFileHandler::todoFileName = ".todo";
 std::string TodoFileHandler::secondaryTodoFileName = ".todoBacklog";
+std::string TodoFileHandler::logfile = ".todolog";
 std::string TodoFileHandler::seperator = "+++";
 int TodoFileHandler::numberOfItems = 0;
 
@@ -25,9 +26,10 @@ std::string TodoFileHandler::getSpecificConfig(std::string file){
     return s;
 }
 
-void TodoFileHandler::setPrimaryAndSecondaryFile(std::string prim, std::string second){
-	TodoFileHandler::todoFileName = prim;
-	TodoFileHandler::secondaryTodoFileName = second;
+void TodoFileHandler::setInitialFiles(std::string prim, std::string second, std::string log){
+    TodoFileHandler::todoFileName = prim;
+    TodoFileHandler::secondaryTodoFileName = second;
+    TodoFileHandler::logfile = log;
 }
 
 void TodoFileHandler::readTempFile(){
@@ -126,17 +128,17 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSinglePriori
         while (getline(file, line)) {
             vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
             int pria = stoi(a.at(3));
-			if(pria == priNum){
-				int ida = stoi(a.at(0));
-				int listid = stoi(a.at(4));
-				TodoItem item(ida, listid, a.at(1), a.at(2), pria);
-				int indexOfOtherList = containsListItemWithId(listOfLists,listid);
-				if(indexOfOtherList > -1){
-					listOfLists.at(indexOfOtherList).addTodoItemToList(item);
-				} else {
-					listOfLists.push_back(ListItem(listid,{item}));
-				}
-			}
+            if(pria == priNum){
+                int ida = stoi(a.at(0));
+                int listid = stoi(a.at(4));
+                TodoItem item(ida, listid, a.at(1), a.at(2), pria);
+                int indexOfOtherList = containsListItemWithId(listOfLists,listid);
+                if(indexOfOtherList > -1){
+                    listOfLists.at(indexOfOtherList).addTodoItemToList(item);
+                } else {
+                    listOfLists.push_back(ListItem(listid,{item}));
+                }
+            }
         }
         file.close();
     }
@@ -151,17 +153,17 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSingleList(i
         while (getline(file, line)) {
             vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
             int listid = stoi(a.at(4));
-			if(listid == listNum){
-				int ida = stoi(a.at(0));
-				int pria = stoi(a.at(3));
-				TodoItem item(ida, listid, a.at(1), a.at(2), pria);
-				int indexOfOtherList = containsListItemWithId(listOfLists,listid);
-				if(indexOfOtherList > -1){
-					listOfLists.at(indexOfOtherList).addTodoItemToList(item);
-				} else {
-					listOfLists.push_back(ListItem(listid,{item}));
-				}
-			}
+            if(listid == listNum){
+                int ida = stoi(a.at(0));
+                int pria = stoi(a.at(3));
+                TodoItem item(ida, listid, a.at(1), a.at(2), pria);
+                int indexOfOtherList = containsListItemWithId(listOfLists,listid);
+                if(indexOfOtherList > -1){
+                    listOfLists.at(indexOfOtherList).addTodoItemToList(item);
+                } else {
+                    listOfLists.push_back(ListItem(listid,{item}));
+                }
+            }
         }
         file.close();
     }
@@ -179,7 +181,7 @@ std::vector<TodoItem> TodoFileHandler::readBackLogFileIntoListItems(){
             int pria = stoi(a.at(3));
             int listid = stoi(a.at(4));
             TodoItem item(ida, listid, a.at(1), a.at(2), pria);
-			listOfItems.push_back(item);
+            listOfItems.push_back(item);
         }
         file.close();
     }
@@ -201,7 +203,7 @@ int TodoFileHandler::containsTodoItemWithId(std::vector<TodoItem> vec,int id){
 
 int TodoFileHandler::containsTodoItemWithIdInList(std::list<TodoItem> vec,int id){
     list<TodoItem>::iterator it;
-	it = std::find_if(vec.begin(), vec.end(), [&](TodoItem &f) { return f.getId() == id; });
+    it = std::find_if(vec.begin(), vec.end(), [&](TodoItem &f) { return f.getId() == id; });
  
     if (it != vec.end()) {
         return std::distance(vec.begin(), it);
@@ -231,5 +233,15 @@ void TodoFileHandler::writeFullListToSpecificFile(std::list<TodoItem> list_of_it
     std::list<TodoItem>::iterator iter;
     for (iter = list_of_items.begin(); iter != list_of_items.end(); ++iter){
         addTodoItemToFileToSpecificFile(iter->getListId(),iter->getTag(),iter->getTitle(),iter->getPriority(),fileToUse);
+    }
+}
+
+void TodoFileHandler::writeToLogFile(bool shouldWrite, std::string message){
+    if(shouldWrite){
+        string timestamp = getCurrentTimeStr();
+        std::ofstream outfile;
+        outfile.open(TodoFileHandler::getSpecificConfig(logfile).c_str(), std::ios_base::app);
+        std::string fullMessage = timestamp + " : " + message + "\n";
+        outfile << fullMessage;
     }
 }

@@ -71,5 +71,3 @@ class Help {
             printf(HELP_TEXT);
         }
 };
-
-

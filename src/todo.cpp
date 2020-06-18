@@ -49,10 +49,15 @@ int tagColorFg = 0;
 int tagColorBg = 0;
 string primaryFile = ".todo";
 string secondaryFile = ".todoBacklog";
+string logfile = "";
+bool shouldLog = false;
 ConfigReader *cnfgReader = new ConfigReader();
 
 int main(int argc, char *argv[])
 {
+    //TODO below is nothing...
+    //cnfgReader->installTodo();
+
     cnfgReader->checkForExistingConfig();
     cnfgReader->readConfigFileIn();
     listOfLists = cnfgReader->getLists();
@@ -61,8 +66,12 @@ int main(int argc, char *argv[])
     tagColorBg = stoi(cnfgReader->getConfigValueForKey("tagColorBack"));
     primaryFile = cnfgReader->getConfigValueForKey("todoFile");
     secondaryFile = cnfgReader->getConfigValueForKey("todoBackUpFile");
-    
-    TodoFileHandler::setPrimaryAndSecondaryFile(primaryFile,secondaryFile);
+
+    logfile = cnfgReader->getConfigValueForKey("logFile");
+    shouldLog = !logfile.empty();
+    TodoFileHandler::setInitialFiles(primaryFile,secondaryFile, logfile);
+    //This works nicely
+    //TodoFileHandler::writeToLogFile(shouldLog,"This is a test");
 
     if(argc == 1){
         readAllTodos();
@@ -113,6 +122,12 @@ int main(int argc, char *argv[])
                     }
                     break;
                 case 't':
+                    //currentListToPutIn = stoi(optarg);
+                    //if(!isThereText(argv,argc,optarg)){
+                    //    readTodosInSingleList(stoi(optarg));
+                    //    exit(0);
+                    //}
+                    // TODO issue
                     currentTag = optarg;
                     break;
                 case 'h':
@@ -165,14 +180,22 @@ bool isThereText(char *argv[], int argc, string thisOpt){
 
 void addATodo(string thing){
     TodoFileHandler::addTodoItemToFileToSpecificFile(currentListToPutIn,currentTag,thing,currentPriority,TodoFileHandler::getSpecificConfig(TodoFileHandler::todoFileName));
+    TodoFileHandler::writeToLogFile(shouldLog,"ADDED: "+thing);
 }
 
 void addATDItemToFile(TodoItem item, string file){
     TodoFileHandler::addactualTDToSpecificFile(item,file);
 }
 
+struct less_than_key{
+    inline bool operator() (ListItem& struct1, ListItem& struct2){
+        return (struct1.getId() < struct2.getId());
+    }
+};
+
 void readAllTodos(){
     vector<ListItem> list_items = TodoFileHandler::readTodoFileIntoListItems();
+    std::sort(list_items.begin(), list_items.end(), less_than_key());
     if(list_items.size() > 0){
         for(size_t i = 0; i < list_items.size(); i++)
         {
@@ -337,6 +360,7 @@ void deleteSingleTodo(int id){
     std::list<TodoItem>::iterator itera = list_items.begin();
     std::advance(itera,indxDel);
     cout << "Deleting : " << itera->getId() << ": "<< itera->getName() << endl;
+    TodoFileHandler::writeToLogFile(shouldLog,"DELETED: "+itera->getName());
     list_items.erase(itera);
 
     std::list<TodoItem>::iterator iter;
@@ -384,8 +408,8 @@ void printConfigData(){
     cout << "Files:";
     cout << " " << whiteText << "Todo file:" << clear << " " << invert << " " << primaryFile << " " << clear << " ";
     cout << " " << whiteText << "BackUp file:" << clear << " " << invert << " " << secondaryFile << " " << clear << " ";
-     cout<< endl;
-     cout<< endl;
+    cout<< endl;
+    cout<< endl;
     
     cout << "Lists:";
     for(size_t i = 0; i < listOfLists.size(); i++)

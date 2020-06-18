@@ -11,6 +11,7 @@ class ConfigReader{
         std::string getConfigFullFileLocation();
     public:
         ConfigReader();
+        void installTodo();
         void checkForExistingConfig();
         void readConfigFileIn();
         std::string getConfigValueForKey(std::string key);
