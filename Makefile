@@ -6,8 +6,8 @@ TARGET=todo
 SRCEXT=cpp
 INC=-I include
 CFLAGS=-g
-SIGFILE="creds.txt"
-SIG=$(shell cat ${SIGFILE})
+#SIGFILE="creds.txt"
+#SIG=$(shell cat ${SIGFILE})
 MANFILE="todo.1"
 MANLOCATION="/usr/local/share/man/man1/"
 

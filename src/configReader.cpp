@@ -28,7 +28,6 @@ void ConfigReader::installTodo(){
 }
 
 void ConfigReader::checkForExistingConfig(){
-
   std::ifstream ifile(getConfigFullFileLocation().c_str());
   if(!(bool)ifile){
       cout << "Config file doesn't exist yet, copying it to HOME dir now" << endl;
