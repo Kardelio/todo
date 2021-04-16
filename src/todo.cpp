@@ -4,14 +4,18 @@
 #include "help.cpp"
 #include "stringUtils.h"
 #include "todoFileHandler.h"
+#include "commandRunner.h"
+#include "googleDrive.h"
 #include "identifier.h"
 #include "todoItem.h"
 #include <vector>
 #include <list>
-#include <fstream>
 #include <unistd.h>
+#include <fstream>
 #include <time.h>
 #include <stdlib.h>
+
+#include <sstream>
 
 using namespace std;
 
@@ -51,13 +55,12 @@ string primaryFile = ".todo";
 string secondaryFile = ".todoBacklog";
 string logfile = "";
 bool shouldLog = false;
+bool shouldUpdateOnRemote = false;
 ConfigReader *cnfgReader = new ConfigReader();
+GoogleDrive *g = new GoogleDrive();
 
 int main(int argc, char *argv[])
 {
-    //TODO below is nothing...
-    //cnfgReader->installTodo();
-
     cnfgReader->checkForExistingConfig();
     cnfgReader->readConfigFileIn();
     listOfLists = cnfgReader->getLists();
@@ -69,16 +72,19 @@ int main(int argc, char *argv[])
 
     logfile = cnfgReader->getConfigValueForKey("logFile");
     shouldLog = !logfile.empty();
+    std::istringstream(cnfgReader->getConfigValueForKey("uploadToDrive")) >> shouldUpdateOnRemote;
     TodoFileHandler::setInitialFiles(primaryFile,secondaryFile, logfile);
-    //This works nicely
-    //TodoFileHandler::writeToLogFile(shouldLog,"This is a test");
 
     if(argc == 1){
         readAllTodos();
     } else {
         int c;
-        while ((c = getopt (argc, argv, "cd:rie:p:l:t:hb:m:sa")) != -1){
+        while ((c = getopt (argc, argv, "gcd:rie:p:l:t:hb:m:sau")) != -1){
             switch (c) {
+                case 'g':
+                    cout << g->getRemoteVersion() << endl;
+                    exit(0);
+                    break;
                 case 'c':
                     clearScreen();
                     drawStartLine();
@@ -148,6 +154,9 @@ int main(int argc, char *argv[])
                     displayBacklogToo = true;
                     readAllTodos();
                     exit(0);
+                case 'u':
+                    g->uploadUpdatedTodoFile(TodoFileHandler::readTodoFileContentsText());
+                    exit(0);
                     break;
                 default:
                     cout << "Invalid Option: " << c << endl;
@@ -181,6 +190,9 @@ bool isThereText(char *argv[], int argc, string thisOpt){
 void addATodo(string thing){
     TodoFileHandler::addTodoItemToFileToSpecificFile(currentListToPutIn,currentTag,thing,currentPriority,TodoFileHandler::getSpecificConfig(TodoFileHandler::todoFileName));
     TodoFileHandler::writeToLogFile(shouldLog,"ADDED: "+thing);
+    if(shouldUpdateOnRemote){
+        g->uploadUpdatedTodoFile(TodoFileHandler::readTodoFileContentsText());
+    }
 }
 
 void addATDItemToFile(TodoItem item, string file){
@@ -351,6 +363,10 @@ void editSingleTodo(int id){
     itera->setListId(stoi(newList));
 
     TodoFileHandler::writeFullListToSpecificFile(list_items,TodoFileHandler::getSpecificConfig(TodoFileHandler::todoFileName));
+    //New uploader
+    if(shouldUpdateOnRemote){
+        g->uploadUpdatedTodoFile(TodoFileHandler::readTodoFileContentsText());
+    }
     readAllTodos();
 }
 
@@ -374,6 +390,9 @@ void deleteSingleTodo(int id){
     TodoFileHandler::writeFullListToSpecificFile(list_items, TodoFileHandler::getSpecificConfig(TodoFileHandler::todoFileName));
     //TODO put deleted ones into own list and write that to the backup
     //just append it
+    if(shouldUpdateOnRemote){
+        g->uploadUpdatedTodoFile(TodoFileHandler::readTodoFileContentsText());
+    }
     readAllTodos();
 }
 
@@ -459,8 +478,10 @@ string editInEditor(string title){
     const char* homeDir = getenv("HOME");
     std::string tempFile(homeDir);
     tempFile.append("/"+std::string(".todo")+std::string(date));
-    system(("echo \""+title+"\" > "+tempFile).c_str()); //Echoes the stirng into the temp file
-    system(("$EDITOR "+tempFile).c_str()); //opens the file
+    CommandRunner::runCommand(("echo \""+title+"\" > "+tempFile).c_str());
+    //system(("echo \""+title+"\" > "+tempFile).c_str()); //Echoes the stirng into the temp file
+    CommandRunner::runCommand(("$EDITOR "+tempFile).c_str());
+    //system(("$EDITOR "+tempFile).c_str()); //opens the file
 
     string outtext = title;
     ifstream infile(tempFile);

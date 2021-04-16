@@ -32,21 +32,19 @@ void TodoFileHandler::setInitialFiles(std::string prim, std::string second, std:
     TodoFileHandler::logfile = log;
 }
 
-void TodoFileHandler::readTempFile(){
+std::string TodoFileHandler::readTodoFileContentsText(){
     list<TodoItem> listOfItems;
     std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());
+    std::string output = "";
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
-            vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
-            int ida = stoi(a.at(0));
-            int pria = stoi(a.at(3));
-            int listid = stoi(a.at(4));
-            TodoItem item(ida, listid, a.at(1), a.at(2), pria);
-            listOfItems.push_back(item);
+            output += line+"\n"; 
         }
         file.close();
+        return output;
     }
+    return "";
 }
 
 std::list<TodoItem> TodoFileHandler::readTodoFileAndGetList(std::string fileToUse){
@@ -87,6 +85,7 @@ void TodoFileHandler::addactualTDToSpecificFile(TodoItem item, std::string fileT
     outfile.open(fileToWriteTo, std::ios_base::app);
     std::string fullRow = std::to_string(TodoFileHandler::getNumberOfItemsInSpecificFile(fileToWriteTo))+""+seperator+""+item.getTag()+""+seperator+""+item.getTitle()+""+seperator+""+std::to_string(item.getPriority())+""+seperator+""+std::to_string(item.getListId())+"\n";
     outfile << fullRow;
+    outfile.close();
 }
 
 void TodoFileHandler::addTodoItemToFileToSpecificFile(int list, std::string tag, std::string thing, int pri, std::string fileToWriteTo){
@@ -95,6 +94,7 @@ void TodoFileHandler::addTodoItemToFileToSpecificFile(int list, std::string tag,
     outfile.open(fileToWriteTo, std::ios_base::app);
     std::string fullRow = std::to_string(TodoFileHandler::getNumberOfItemsInSpecificFile(fileToWriteTo))+""+seperator+""+tag+""+seperator+""+thing+""+seperator+""+std::to_string(pri)+""+seperator+""+std::to_string(list)+"\n";
     outfile << fullRow;
+    outfile.close();
 }
 
 std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItems(){
