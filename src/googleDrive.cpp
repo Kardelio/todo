@@ -59,7 +59,7 @@ bool GoogleDrive::authenticate(){
             return false;
         }
     } else {
-        cout << "No match omg" << endl;
+        cout << response << endl;
         return false;
     }
 }
