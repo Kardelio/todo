@@ -120,6 +120,31 @@ std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItems(){
     return listOfLists;
 }
 
+std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSingleTag(std::string tag){
+    vector<ListItem> listOfLists;
+    std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            vector<string> a = splitStringIntoArrayUsingDelim(line,seperator);
+            std::string taga = a.at(1);
+            if(taga == tag){
+                int ida = stoi(a.at(0));
+                int listid = stoi(a.at(4));
+                TodoItem item(ida, listid, taga, a.at(2), stoi(a.at(3)));
+                int indexOfOtherList = containsListItemWithId(listOfLists,listid);
+                if(indexOfOtherList > -1){
+                    listOfLists.at(indexOfOtherList).addTodoItemToList(item);
+                } else {
+                    listOfLists.push_back(ListItem(listid,{item}));
+                }
+            }
+        }
+        file.close();
+    }
+    return listOfLists;
+}
+
 std::vector<ListItem> TodoFileHandler::readTodoFileIntoListItemsWithSinglePriority(int priNum){
     vector<ListItem> listOfLists;
     std::ifstream file(TodoFileHandler::getSpecificConfig(todoFileName).c_str());

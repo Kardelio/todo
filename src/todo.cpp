@@ -24,6 +24,7 @@ bool isThereText(char *argv[], int argc, string thisOpt);
 void readAllTodos();
 void readTodosInSingleList(int listNum);
 void readTodosInSinglePriority(int priNum);
+void readTodosInSingleTag(string tag);
 void addATodo(string thing); void addATDItemToFile(TodoItem item, string file);
 void deleteSingleTodo(int id);
 TodoItem getSingleTodoItem(int id, string file);
@@ -128,13 +129,11 @@ int main(int argc, char *argv[])
                     }
                     break;
                 case 't':
-                    //currentListToPutIn = stoi(optarg);
-                    //if(!isThereText(argv,argc,optarg)){
-                    //    readTodosInSingleList(stoi(optarg));
-                    //    exit(0);
-                    //}
-                    // TODO issue
                     currentTag = optarg;
+                    if(!isThereText(argv,argc,optarg)){
+                        readTodosInSingleTag(optarg);
+                        exit(0);
+                    }
                     break;
                 case 'h':
                     Help::printHelp();
@@ -243,6 +242,30 @@ void readAllTodos(){
         }
         cout << endl;
     }
+}
+
+void readTodosInSingleTag(string tag){
+    vector<ListItem> list_items = TodoFileHandler::readTodoFileIntoListItemsWithSingleTag(tag);
+    if(list_items.size() > 0){
+        for(size_t i = 0; i < list_items.size(); i++)
+        {
+            int res = identifierListContainsId(listOfLists,list_items.at(i).getId());
+            if(res > -1){
+                Identifier item = listOfLists.at(res);
+                cout << endl;
+                cout << item.getColorWithEscapes() << "    " << item.getId() << ". " << escape << "[1m" << item.getTitle() << "      " << clear << endl;
+                
+                for(size_t j = 0; j < list_items.at(i).getListOfTodoItems().size(); j++)
+                {
+                    TodoItem t = list_items.at(i).getListOfTodoItems().at(j);
+                    t.printWithFGandBGNew(listOfLists.at(res).getColorWithEscapes(), *cnfgReader,listOfPriorities);
+                }
+            }
+        }
+    } else {
+        cout << "Empty" << endl;
+    }
+    cout << endl;
 }
 
 void readTodosInSinglePriority(int priNum){
