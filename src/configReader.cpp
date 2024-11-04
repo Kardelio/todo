@@ -85,7 +85,6 @@ std::vector<Identifier> ConfigReader::getPriorities(){
     vector<string> allLists = splitStringIntoArrayUsingDelim(val,"-");
     for(size_t i = 0; i < allLists.size(); i++)
     {
-        std:cout << allLists.at(i) << "\n";
         vector<string> eachElm = splitStringIntoArrayUsingDelim(allLists.at(i),",");
         int id = stoi(eachElm.at(0));
         string label = eachElm.at(1);
