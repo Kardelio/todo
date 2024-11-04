@@ -85,7 +85,7 @@ run: $(TARGET)
 man-in: 
 	@echo "Installing the man page" $(mandir)
 	@echo "At: /usr/local/share/man/man1"
-	cp $(MANFILE) $(MANLOCATION)
+	#cp $(MANFILE) $(MANLOCATION)
 
 man-un: 
 	@echo "Uninstalling the man page" $(mandir)
